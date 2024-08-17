@@ -1,0 +1,75 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Auth Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/auth-service/main.go"
+        },
+        {
+            "name": "Debug User Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/user-service/main.go"
+        },
+        {
+            "name": "Debug Content Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/content-service/main.go"
+        },
+        {
+            "name": "Debug Comments Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/comments-service/main.go"
+        },
+        {
+            "name": "Debug Search Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/search-service/main.go"
+        },
+        {
+            "name": "Debug Analytics Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/analytics-service/main.go"
+        },
+        {
+            "name": "Debug Notifications Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/notifications-service/main.go"
+        },
+        {
+            "name": "Debug Recommendation Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/recommendation-service/main.go"
+        },
+        {
+            "name": "Debug Media Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/media-service/main.go"
+        },
+        {
+            "name": "Debug Payments Service",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/payments-service/main.go"
+        }
+    ]
+}
