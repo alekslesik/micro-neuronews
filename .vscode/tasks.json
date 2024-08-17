@@ -1,0 +1,75 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Auth Service",
+            "type": "shell",
+            "command": "go run ./auth-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run User Service",
+            "type": "shell",
+            "command": "go run ./user-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Content Service",
+            "type": "shell",
+            "command": "go run ./content-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Comments Service",
+            "type": "shell",
+            "command": "go run ./comments-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Search Service",
+            "type": "shell",
+            "command": "go run ./search-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Analytics Service",
+            "type": "shell",
+            "command": "go run ./analytics-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Notifications Service",
+            "type": "shell",
+            "command": "go run ./notifications-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Recommendation Service",
+            "type": "shell",
+            "command": "go run ./recommendation-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Media Service",
+            "type": "shell",
+            "command": "go run ./media-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Payments Service",
+            "type": "shell",
+            "command": "go run ./payments-service/main.go",
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}
