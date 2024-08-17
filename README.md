@@ -41,3 +41,35 @@
 ### 11. **API Gateway**
    - **Responsibilities**: Managing incoming requests and routing them to the appropriate microservices.
    - **Technologies**: Go-based API Gateway (like Kong or Traefik).
+
+``` golang
+# Step 1: Create the root directory of the project
+mkdir my-news-app
+cd my-news-app
+
+# Step 2: Create directories for each microservice
+mkdir auth-service user-service content-service comments-service search-service analytics-service notifications-service recommendation-service media-service payments-service
+
+# Step 3: Create main Go files and module files for each microservice
+for service in auth-service user-service content-service comments-service search-service analytics-service notifications-service recommendation-service media-service payments-service
+do
+    touch $service/main.go
+    touch $service/go.mod
+done
+
+# Step 4: Initialize Go modules for each microservice
+for service in auth-service user-service content-service comments-service search-service analytics-service notifications-service recommendation-service media-service payments-service
+do
+    cd $service
+    go mod init github.com/username/$service
+    cd ..
+done
+
+# Step 5: Create the Docker Compose file and VSCode configuration files
+touch docker-compose.yml
+mkdir .vscode
+touch .vscode/tasks.json .vscode/launch.json
+touch Makefile
+```
+
+
