@@ -72,4 +72,9 @@ touch .vscode/tasks.json .vscode/launch.json
 touch Makefile
 ```
 
-
+### Instruments
+* [Написать свой API-шлюз с нуля](https://nuancesprog.ru/p/13579/)
+* [Сервис на GO. Runtime контроллер и Graceful Shutdown](https://habr.com/ru/companies/timeweb/articles/589167/)
+* [Микросервисы на Go с помощью Go kit: Введение ](https://habr.com/ru/articles/430300/)
+* [Секреты разработки высокопроизводительных приложений и микросервисов](https://nuancesprog.ru/p/16349/)
+* [Самоучитель по CI/CD и Kubernetes для Go-разработчиков](https://ru.werf.io/guides/golang/100_basic.html)
