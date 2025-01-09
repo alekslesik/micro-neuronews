@@ -1,80 +1,188 @@
-### 1. **Authentication and Authorization Microservice**
-   - **Responsibilities**: User registration, login, session management, two-factor authentication.
-   - **Technologies**: JWT, OAuth 2.0, bcrypt for password hashing.
+Организация микросервисов для вашего сайта будет базироваться на разделении ответственности между компонентами системы. Вот пример проектирования микросервисной архитектуры, которая покрывает описанные требования:
 
-### 2. **User Management Microservice**
-   - **Responsibilities**: Managing user profiles, preferences, and settings.
-   - **Technologies**: REST API or gRPC for communication with other services.
+---
 
-### 3. **Content Management Microservice**
-   - **Responsibilities**: Creating, editing, publishing news articles, managing categories, and tags.
-   - **Technologies**: Go with an ORM (like GORM) for database interactions.
+### 1. **Микросервисы по ответственности**
 
-### 4. **Comments Microservice**
-   - **Responsibilities**: Handling comments, moderation, and like/dislike counts.
-   - **Technologies**: Integration with Redis for caching like counts or other temporary data.
+1. **Frontend Service** (Фронтенд)
+   - Отвечает за рендеринг статического HTML или предоставление данных для SPA (если фронтенд — на клиентском JS).
+   - Отдает страницы: главная, новости по группам, конкретная новость, личный кабинет, статические страницы (например, "О нас").
+   - Делает запросы к другим микросервисам для получения данных через API Gateway.
 
-### 5. **Search Microservice**
-   - **Responsibilities**: Search across news articles, tags, users, and other entities.
-   - **Technologies**: Elasticsearch or similar tools for indexing and search functionality.
+2. **News Service** (Сервис новостей)
+   - Отвечает за управление новостями.
+   - Хранит в базе данных информацию о новостях: заголовки, контент, категории, изображения, метаданные.
+   - Обрабатывает запросы:
+     - Новости для главной страницы (слайдер, группы, популярные).
+     - Новости по категориям (спорт, политика и т.д.).
+     - Конкретная новость.
+   - Поддерживает функционал бесконечной ленты (пагинация).
 
-### 6. **Analytics Microservice**
-   - **Responsibilities**: Collecting and analyzing data on site traffic, user activity, and news popularity.
-   - **Technologies**: Tools like Prometheus, Grafana, and databases like ClickHouse for analytics storage.
+3. **Scraper Service** (Сервис парсинга новостей)
+   - Периодически парсит новости с внешних сайтов.
+   - Использует расписание (например, `cron` или `scheduler`) для запуска задач.
+   - Сохраняет новости в `News Service`.
 
-### 7. **Notifications Microservice**
-   - **Responsibilities**: Managing notifications (email, push notifications, in-browser alerts).
-   - **Technologies**: Message queues like RabbitMQ or Kafka for asynchronous task processing.
+4. **Image Generation Service** (Генерация изображений)
+   - Работает с Kandinsky API или другим AI для генерации изображений по заголовкам новостей.
+   - Принимает запросы от `Scraper Service` или `News Service` для создания изображений.
+   - Возвращает сгенерированные изображения или их ссылки.
 
-### 8. **Recommendation Microservice**
-   - **Responsibilities**: Providing personalized news recommendations based on user preferences and behavior.
-   - **Technologies**: Machine learning tools, recommendation systems like TensorFlow or GoLearn library.
+5. **User Service** (Пользователи)
+   - Управляет данными пользователей: регистрация, авторизация, личный кабинет.
+   - Хранит настройки пользователей, например, предпочтительные категории новостей или сохраненные статьи.
 
-### 9. **Media Management Microservice**
-   - **Responsibilities**: Uploading, storing, and delivering images, videos, and other media files.
-   - **Technologies**: S3-compatible storage solutions (e.g., MinIO), CDN for media delivery.
+6. **Static Pages Service** (Статические страницы)
+   - Предоставляет статический контент для страниц, таких как "О нас", "Контакты" и т.д.
+   - Может быть частью фронтенда, если объем небольшой.
 
-### 10. **Payments Microservice**
-   - **Responsibilities**: Handling paid subscriptions, donations, and other financial transactions.
-   - **Technologies**: Integration with payment gateways like Stripe or PayPal.
+7. **Analytics Service** (Аналитика)
+   - Сохраняет статистику посещений, популярные страницы, взаимодействия пользователей.
+   - Позволяет показывать популярные новости на основе данных аналитики.
 
-### 11. **API Gateway**
-   - **Responsibilities**: Managing incoming requests and routing them to the appropriate microservices.
-   - **Technologies**: Go-based API Gateway (like Kong or Traefik).
+8. **API Gateway**
+   - Прокси-сервис, который маршрутизирует запросы между фронтендом и микросервисами.
+   - Объединяет ответы от нескольких сервисов (например, для главной страницы).
 
-``` golang
-# Step 1: Create the root directory of the project
-mkdir my-news-app
-cd my-news-app
+---
 
-# Step 2: Create directories for each microservice
-mkdir auth-service user-service content-service comments-service search-service analytics-service notifications-service recommendation-service media-service payments-service
+### 2. **Пример потоков взаимодействия**
 
-# Step 3: Create main Go files and module files for each microservice
-for service in auth-service user-service content-service comments-service search-service analytics-service notifications-service recommendation-service media-service payments-service
-do
-    touch $service/main.go
-    touch $service/go.mod
-done
+#### Главная страница
+1. Клиент делает запрос `GET /home` на API Gateway.
+2. API Gateway вызывает:
+   - `News Service` для получения данных: слайдер, новости по категориям, популярные новости, бесконечная лента.
+   - `Analytics Service` (опционально) для определения популярных новостей.
+3. Собранные данные возвращаются фронтенду, который рендерит страницу.
 
-# Step 4: Initialize Go modules for each microservice
-for service in auth-service user-service content-service comments-service search-service analytics-service notifications-service recommendation-service media-service payments-service
-do
-    cd $service
-    go mod init github.com/username/$service
-    cd ..
-done
+---
 
-# Step 5: Create the Docker Compose file and VSCode configuration files
-touch docker-compose.yml
-mkdir .vscode
-touch .vscode/tasks.json .vscode/launch.json
-touch Makefile
+#### Парсинг и генерация изображений
+1. `Scraper Service` запускает задачу на парсинг новостей с внешнего сайта.
+2. После сохранения новости в базу, `Scraper Service` отправляет запрос в `Image Generation Service` с заголовком.
+3. `Image Generation Service` формирует изображение через Kandinsky API и возвращает ссылку.
+4. `Scraper Service` сохраняет эту ссылку в базу через `News Service`.
+
+---
+
+#### Личная страница пользователя
+1. Клиент делает запрос `GET /user/profile` через API Gateway.
+2. API Gateway перенаправляет запрос в `User Service`.
+3. `User Service` возвращает информацию о пользователе, предпочтительных категориях и сохраненных новостях.
+
+---
+
+### 3. **База данных**
+
+Каждый микросервис имеет свою базу данных, чтобы поддерживать **принцип независимости микросервисов**.
+
+#### Пример структуры баз:
+- **News Service:**
+  - Таблица `news`: ID, заголовок, контент, категория, дата публикации, ссылка на изображение, источник.
+  - Таблица `categories`: ID, имя (спорт, политика и т.д.).
+- **User Service:**
+  - Таблица `users`: ID, имя, email, хэш пароля, настройки.
+  - Таблица `saved_news`: ID пользователя, ID новости.
+- **Analytics Service:**
+  - Таблица `page_views`: ID, страница, количество просмотров.
+  - Таблица `popular_news`: ID новости, просмотры.
+
+---
+
+### 4. **Технологический стек**
+
+#### Backend (Go)
+- Используйте **gRPC** или **REST** для взаимодействия микросервисов.
+- `gin` или `echo` для REST API.
+- `cron` или `go-scheduler` для расписания задач.
+
+#### База данных
+- **PostgreSQL** или **MySQL** для реляционных данных (новости, пользователи).
+- **Redis** для кэша (например, для хранения популярных новостей).
+
+#### Фоновые задачи
+- Используйте **RabbitMQ** или **Kafka** для очередей сообщений между микросервисами (например, передача задач генерации изображений).
+
+---
+
+### 5. **Пример структуры проекта**
+
+```plaintext
+project/
+├── api-gateway/              # API Gateway
+│   └── main.go
+├── services/
+│   ├── news-service/         # Сервис управления новостями
+│   │   ├── main.go
+│   │   └── db/
+│   │       ├── migrations/
+│   │       └── schema.sql
+│   ├── scraper-service/      # Сервис парсинга
+│   │   ├── main.go
+│   │   └── scraper/
+│   ├── image-service/        # Генерация изображений
+│   │   └── main.go
+│   ├── user-service/         # Управление пользователями
+│   │   └── main.go
+│   ├── analytics-service/    # Аналитика
+│   │   └── main.go
+│   └── static-pages-service/ # Статические страницы
+│       └── main.go
+├── docker-compose.yml        # Docker Compose для микросервисов
+└── README.md
 ```
 
-### Instruments
-* [Написать свой API-шлюз с нуля](https://nuancesprog.ru/p/13579/)
-* [Сервис на GO. Runtime контроллер и Graceful Shutdown](https://habr.com/ru/companies/timeweb/articles/589167/)
-* [Микросервисы на Go с помощью Go kit: Введение ](https://habr.com/ru/articles/430300/)
-* [Секреты разработки высокопроизводительных приложений и микросервисов](https://nuancesprog.ru/p/16349/)
-* [Самоучитель по CI/CD и Kubernetes для Go-разработчиков](https://ru.werf.io/guides/golang/100_basic.html)
+---
+
+### 6. **Docker Compose**
+
+Пример `docker-compose.yml` для запуска микросервисов:
+
+```yaml
+version: "3.8"
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+
+  news-service:
+    build: ./services/news-service
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_URL=postgres://user:password@db/news
+
+  scraper-service:
+    build: ./services/scraper-service
+
+  image-service:
+    build: ./services/image-service
+
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "8082:8082"
+    environment:
+      - DATABASE_URL=postgres://user:password@db/users
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: redis:alpine
+```
+
+---
+
+### Итоговая архитектура
+
+- **API Gateway**: Центральный вход для фронтенда, маршрутизирует запросы.
+- **Микросервисы**: Четко разделены по ответственности.
+- **Очереди**: Для фоновых задач и взаимодействия между сервисами.
+- **Кэш**: Для ускорения доступа к популярным данным.
+
+Этот подход обеспечивает гибкость, масштабируемость и возможность легко добавлять новые функции.
